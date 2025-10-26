@@ -50,19 +50,18 @@ export async function POST(req: NextRequest) {
     const userContent: any[] = [{ type: 'text', text: JSON.stringify(meta) }];
     userContent.push(...image_urls.map((u: string) => ({ type: 'input_image', image_url: u })));
 
-    const resp = await client.responses.create({
+    const resp = await client.chat.completions.create({
       model: 'gpt-4o',
       messages: [
-        { role: 'system', content: [{ type: 'text', text: systemText }] },
-        { role: 'user', content: userContent }
+        { role: 'system', content: systemText },
+        { role: 'user', content: JSON.stringify(meta) + " " + image_urls.join(", ") }
       ],
       tools,
-      tool_choice: { type: 'function', name: 'return_quote_inputs' },
-      parallel_tool_calls: false
+      tool_choice: { type: 'function', name: 'return_quote_inputs' }
     });
 
     const content: any[] = resp.output?.[0]?.content ?? [];
-    const toolCall: any = content.find((c: any) => c.type === 'tool_call');
+    const toolCall = resp.choices[0].message.tool_calls?.[0];
     if (!toolCall) return NextResponse.json({ error: 'model returned no tool output' }, { status: 500 });
 
     const data = JSON.parse(toolCall.function.arguments);
