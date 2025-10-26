@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         { role: 'user', content: JSON.stringify(meta) + " " + image_urls.join(", ") }
       ],
       tools,
-      tool_choice: { type: 'function', name: 'return_quote_inputs' }
+      tool_choice: { type: 'function', function: { name: 'return_quote_inputs' } }
     });
 
     const content: any[] = resp.output?.[0]?.content ?? [];
