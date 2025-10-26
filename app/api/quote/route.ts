@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
               confidence: { type: 'number' },
               notes: { type: 'string' }
             },
-            required: ['areaGuess_m2','areaLow_m2','areaHigh_m2','cleanliness','confidence']
+            required: ['areaGuess_m2','areaLow_m2','areaHigh_m2','cleanliness','confidence','notes'],
+            additionalProperties: false
           },
           strict: true
       }}
@@ -48,19 +49,18 @@ export async function POST(req: NextRequest) {
 
     const meta = { scale_meters, polygon_area_m2 };
     const userContent: any[] = [{ type: 'text', text: JSON.stringify(meta) }];
-    userContent.push(...image_urls.map((u: string) => ({ type: 'input_image', image_url: u })));
+    userContent.push(...image_urls.map((u: string) => ({ type: 'image_url', image_url: { url: u } })));
 
     const resp = await client.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemText },
-        { role: 'user', content: JSON.stringify(meta) + " " + image_urls.join(", ") }
+        { role: 'user', content: userContent }
       ],
       tools,
       tool_choice: { type: 'function', function: { name: 'return_quote_inputs' } }
     });
 
-    const content: any[] = resp.output?.[0]?.content ?? [];
     const toolCall = resp.choices[0].message.tool_calls?.[0];
     if (!toolCall) return NextResponse.json({ error: 'model returned no tool output' }, { status: 500 });
 
