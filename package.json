@@ -14,5 +14,9 @@
     "openai": "^4.57.0",
     "zod": "^3.23.8",
     "@vercel/blob": "^0.24.1"
+  },
+    "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/react": "^18.3.1"
   }
 }
