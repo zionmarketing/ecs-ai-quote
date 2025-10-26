@@ -13,7 +13,8 @@ function priceQuote(area: number, bucket: "Light"|"Medium"|"Heavy") {
 
 export async function POST(req: NextRequest) {
   try {
-    const { image_urls, scale_meters = null, polygon_area_m2 = null, currency = 'EUR' } = await req.json();
+    console.log("🔑 OpenAI key prefix:", process.env.OPENAI_API_KEY?.slice(0, 10) || 'undefined');
+    const { image_urls, scale_meters = null, polygon_area_m2 = null, currency = 'GBP' } = await req.json();
     if (!Array.isArray(image_urls) || image_urls.length === 0) return NextResponse.json({ error: 'image_urls required' }, { status: 400 });
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
