@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         { role: 'user', content: userContent }
       ],
       tools,
-      tool_choice: { type: 'function', function: { name: 'return_quote_inputs' } },
+      tool_choice: { type: 'tool', name: 'return_quote_inputs' },
       parallel_tool_calls: false
     });
 
